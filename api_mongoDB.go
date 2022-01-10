@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	"github.com/free5gc/MongoDBLibrary/logger"
 )
@@ -70,10 +71,49 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
+func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int64 {
+	collection := Client.Database(dbName).Collection(collName)
+
+	// get count of documents collection to be used as unique id
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	count, _ := collection.CountDocuments(ctx, filter)
+
+	// insert document so next call to this API will have new count
+	putData["count"] = count
+	collection.InsertOne(ctx, putData)
+	return count
+}
+
 func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
 
 	var checkItem map[string]interface{}
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
+}
+
+func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}) bool {
+	collection := Client.Database(dbName).Collection(collName)
+	var checkItem map[string]interface{}
+
+	// TTL index
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "createdAt", Value: bsonx.Int32(1)}},
+		Options: options.Index().SetExpireAfterSeconds(120),
+	}
+
+	_, err := collection.Indexes().CreateOne(context.Background(), index)
+	if err != nil {
+		logger.MongoDBLog.Panic(err)
+	}
+
 	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
 
 	if checkItem == nil {
