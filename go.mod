@@ -1,4 +1,4 @@
-module github.com/osmanamjad/MongoDBLibrary
+module github.com/osmanamjad/MongoDBLibrary-1
 
 go 1.14
 
