@@ -15,6 +15,7 @@ import (
 
 type Student struct {
 	name      string
+	age 	  int 
 	createdAt time.Time
 }
 

@@ -82,6 +82,11 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	putData["count"] = count
 	collection.InsertOne(ctx, putData)
 	return count
+
+	// can we select uusing our own field like count. can we make any primary key? can we fetch docs using that key? can we have multiple search
+	// keys?
+
+	// can we create go based structure that we store and get back?
 }
 
 func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
