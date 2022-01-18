@@ -84,10 +84,16 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	count := counterCollection.FindOneAndUpdate(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
 
 	if count.Err() != nil {
-		count = 0
 		counterData := bson.M{}
-		counterData["count"] = count
+		counterData["count"] = 0
 		counterCollection.InsertOne(context.TODO(), counterData)
+		putData["count"] = 0
+		collection.InsertOne(context.TODO(), putData)
+		return 0
+	} else {
+		putData["count"] = count+1
+		collection.InsertOne(context.TODO(), putData)
+		return count
 	}
 
 	/*
@@ -112,11 +118,6 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	// get count of documents collection to be used as unique id
 	//ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	//count, _ := collection.CountDocuments(ctx, filter)
-
-	// insert document so next call to this API will have new count
-	putData["count"] = count
-	collection.InsertOne(context.TODO(), putData)
-	return count
 
 	// can we select uusing our own field like count. can we make any primary key? can we fetch docs using that key? can we have multiple search
 	// keys?
