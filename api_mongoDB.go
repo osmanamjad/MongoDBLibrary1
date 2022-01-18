@@ -83,7 +83,7 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 
 	count, err := counterCollection.FindOneAndUpdate(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
 
-	if err != nil {
+	if count.Err() != nil {
 		count = 0
 		counterData := bson.M{}
 		counterData["count"] = count
