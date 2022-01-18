@@ -86,7 +86,7 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 		counterData["count"] = count
 		counterCollection.InsertOne(context.TODO(), counterData)
 	} else {
-		count = int(checkItem["count"])
+		count = checkItem["count"].(int)
 		counterCollection.UpdateOne(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
 	}
 	
