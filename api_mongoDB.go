@@ -90,8 +90,6 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 		counterCollection.UpdateOne(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
 	}
 	
-	//b := counterCollection.FindOneAndUpdate(ctx, bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
-
 	// use couunter document instead of taking count of docs. 
 
 	// seaparte apis for  range and norange
@@ -132,14 +130,14 @@ func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interfa
 	}
 }
 
-func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}) bool {
+func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int, timeField string) bool {
 	collection := Client.Database(dbName).Collection(collName)
 	var checkItem map[string]interface{}
 
 	// TTL index
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "createdAt", Value: bsonx.Int32(1)}},
-		Options: options.Index().SetExpireAfterSeconds(120),
+		Keys:    bsonx.Doc{{Key: timeField, Value: bsonx.Int32(1)}},
+		Options: options.Index().SetExpireAfterSeconds(timeout),
 	}
 
 	_, err := collection.Indexes().CreateOne(context.Background(), index)

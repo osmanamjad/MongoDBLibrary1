@@ -54,5 +54,5 @@ func createStudentWithTimeout() {
 	putData["name"] = "Osman"
 	putData["createdAt"] = time.Now()
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneWithTimeout("student", filter, putData)
+	MongoDBLibrary.RestfulAPIPutOneWithTimeout("student", filter, putData, 120, "createdAt")
 }
