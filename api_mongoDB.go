@@ -91,9 +91,11 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 		collection.InsertOne(context.TODO(), putData)
 		return 0
 	} else {
-		putData["count"] = count+1
+		data := bson.M{}
+		count.Decode(&data)
+		putData["count"] = data["count"]+1
 		collection.InsertOne(context.TODO(), putData)
-		return count
+		return data["count"]+1
 	}
 
 	/*
