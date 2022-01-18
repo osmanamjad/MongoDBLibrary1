@@ -277,6 +277,8 @@ github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118174342-155d3f71ca17 h1:Cw8uj
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118174342-155d3f71ca17/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118174719-26822de168a7 h1:Tgg+KrMdL8BQJHSqe8416Nf1iy3aSFes6xe/16qZPPU=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118174719-26822de168a7/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118180542-63037f416f15 h1:KnSTkuyXg8/sh7g+3rBiCr8f3Fmsb6OUo2nuPIiVW2c=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118180542-63037f416f15/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/osmanamjad/MongoDBLibrary v1.0.1-0.20211214084939-cce1d833e08a h1:+ik00ZrlFDDLJGLNaKvGHBO4SERlnFbjH6aX4+JY+g0=
 github.com/osmanamjad/MongoDBLibrary v1.0.1-0.20211214084939-cce1d833e08a/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/osmanamjad/MongoDBLibrary-1 v0.0.0-20220110232737-1ebf5684244a h1:B1RE0fsBNAqpvG6vSLfSROaOh332wGd4LetqzEq0u8U=

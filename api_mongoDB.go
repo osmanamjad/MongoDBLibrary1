@@ -71,7 +71,7 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
-func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int {
+func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int32 {
 	collection := Client.Database(dbName).Collection(collName)
 
 	counterCollection := Client.Database(dbName).Collection("counter")
