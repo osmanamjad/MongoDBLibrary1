@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/free5gc/logger_util v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118193655-ff6575ef09f2
+	github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118194028-20ff7a8c6624
 	github.com/spf13/viper v1.8.1 // indirect
 	go.mongodb.org/mongo-driver v1.7.3
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
