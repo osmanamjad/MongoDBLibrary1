@@ -42,7 +42,7 @@ func main() {
 	}
 }
 
-func getUniqueIdentity(name string) int64 {
+func getUniqueIdentity(name string) int {
 	putData := bson.M{}
 	putData["name"] = name
 	filter := bson.M{}
