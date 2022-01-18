@@ -130,7 +130,7 @@ func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interfa
 	}
 }
 
-func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int, timeField string) bool {
+func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int32, timeField string) bool {
 	collection := Client.Database(dbName).Collection(collName)
 	var checkItem map[string]interface{}
 

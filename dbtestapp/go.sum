@@ -267,6 +267,8 @@ github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3Rllmb
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118180657-4d73b0c9085e h1:TcLq9RebeYuvX7DZUKyeSAfwN5AzOl4x731GrPzLQY8=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118180657-4d73b0c9085e/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118193655-ff6575ef09f2 h1:1SVVOf2iWgYJs1hf44ScqUrrudubgDHitA32L6EMC0E=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220118193655-ff6575ef09f2/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.7.0/go.mod h1:vwGMzjaWMwyfHwgIBhI2YUM4fB6nL6lVAvS1LBMMhTE=
 github.com/pelletier/go-toml v1.9.3/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
