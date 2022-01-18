@@ -9,7 +9,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/omec-project/MongoDBLibrary"
+	"github.com/osmanamjad/MongoDBLibrary"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

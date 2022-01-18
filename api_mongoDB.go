@@ -74,9 +74,37 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int64 {
 	collection := Client.Database(dbName).Collection(collName)
 
+	counterCollection := Client.Database(dbName).Collection("counter")
+
+	var checkItem map[string]interface{}
+	counterCollection.FindOne(context.TODO(), bson.M{}).Decode(&checkItem)
+
+	count := 0
+
+	if checkItem == nil {
+		counterData := bson.M{}
+		counterData["count"] = count
+		counterCollection.InsertOne(context.TODO(), counterData)
+	} else {
+		count = checkItem["count"]
+		counterCollection.UpdateOne(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
+	}
+	
+	//b := counterCollection.FindOneAndUpdate(ctx, bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
+
+	// use couunter document instead of taking count of docs. 
+
+	// seaparte apis for  range and norange
+
+	// make api more generic with arguments passed in.
+
+	// identity can be restriced within range, we need to handle this. 
+
+	// uniqe id between 1-255. error/cant insert otherwise. 
+
 	// get count of documents collection to be used as unique id
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	count, _ := collection.CountDocuments(ctx, filter)
+	//ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	//count, _ := collection.CountDocuments(ctx, filter)
 
 	// insert document so next call to this API will have new count
 	putData["count"] = count
