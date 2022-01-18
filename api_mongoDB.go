@@ -71,7 +71,7 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
-func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int {
+func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int32 {
 	collection := Client.Database(dbName).Collection(collName)
 
 	counterCollection := Client.Database(dbName).Collection("counter")
@@ -93,7 +93,7 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	} else {
 		data := bson.M{}
 		count.Decode(&data)
-		decodedCount := data["count"].(int)
+		decodedCount := data["count"].(int32)
 		putData["count"] = decodedCount+1
 		collection.InsertOne(context.TODO(), putData)
 		return decodedCount
