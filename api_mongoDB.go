@@ -81,6 +81,16 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 
 	var count int32 = 0
 
+	count, err := counterCollection.FindOneAndUpdate(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
+
+	if err != nil {
+		count = 0
+		counterData := bson.M{}
+		counterData["count"] = count
+		counterCollection.InsertOne(context.TODO(), counterData)
+	}
+
+	/*
 	if checkItem == nil {
 		counterData := bson.M{}
 		counterData["count"] = count
@@ -89,12 +99,11 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 		count = checkItem["count"].(int32)
 		counterCollection.UpdateOne(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
 	}
+	*/
 	
 	// use couunter document instead of taking count of docs. 
 
 	// seaparte apis for  range and norange
-
-	// make api more generic with arguments passed in.
 
 	// identity can be restriced within range, we need to handle this. 
 
