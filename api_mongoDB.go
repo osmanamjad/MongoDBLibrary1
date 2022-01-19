@@ -86,10 +86,8 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 			counterData := bson.M{}
 			counterData["count"] = 1
 			counterData["_id"] = "uniqueIdentity"
-			_, err := counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
+			counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
 			
-			//putData["count"] = 0
-			//collection.InsertOne(context.TODO(), putData)
 			continue
 		} else {
 			data := bson.M{}
