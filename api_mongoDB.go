@@ -108,17 +108,9 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	}
 	*/
 	
-	// use couunter document instead of taking count of docs. 
-
 	// seaparte apis for  range and norange
 
-	// identity can be restriced within range, we need to handle this. 
-
 	// uniqe id between 1-255. error/cant insert otherwise. 
-
-	// get count of documents collection to be used as unique id
-	//ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	//count, _ := collection.CountDocuments(ctx, filter)
 
 	// can we select uusing our own field like count. can we make any primary key? can we fetch docs using that key? can we have multiple search
 	// keys?
@@ -130,6 +122,21 @@ func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interfa
 	collection := Client.Database(dbName).Collection(collName)
 
 	var checkItem map[string]interface{}
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
+}
+
+func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
+	collection := Client.Database(dbName).Collection(collName)
+
+	var checkItem map[string] interface{}
 	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
 
 	if checkItem == nil {
