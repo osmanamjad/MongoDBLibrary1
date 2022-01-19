@@ -122,9 +122,9 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	// can we create go based structure that we store and get back?
 }
 
-func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) interface{} {
+//func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) interface{} {
 
-}
+//}
 
 func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
