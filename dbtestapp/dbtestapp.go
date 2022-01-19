@@ -8,15 +8,23 @@ package main
 import (
 	"log"
 	"time"
+	//"context"
+	//"fmt"
+	//"os"
 
-	"github.com/omec-project/MongoDBLibrary"
+	//"go.mongodb.org/mongo-driver/bson/primitive"
+	//"go.mongodb.org/mongo-driver/mongo"
+	//"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/osmanamjad/MongoDBLibrary"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Student struct {
-	name      string
-	age 	  int 
-	createdAt time.Time
+	//ID     		primitive.ObjectID 	`bson:"_id,omitempty"`
+	Name      	string				`bson:"name,omitempty"`
+	Age 	  	int 				`bson:"age,omitempty"`
+	CreatedAt 	time.Time			`bson:"createdAt,omitempty"`
 }
 
 func main() {
@@ -25,16 +33,19 @@ func main() {
 	// connect to mongoDB
 	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
 
-	// my function call
-	createStudentWithTimeout()
+	insertStudentInDB("Osman Amjad", 21)
 
-	uniqueId := getUniqueIdentity("simapp")
+	insertStudentInDB("John Smith", 25)
+
+	createDocumentWithTimeout()
+
+	uniqueId := MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = getUniqueIdentity("SMF")
+	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = getUniqueIdentity("UDM")
+	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
 	for {
@@ -42,17 +53,20 @@ func main() {
 	}
 }
 
-func getUniqueIdentity(name string) int64 {
-	putData := bson.M{}
-	putData["name"] = name
+func insertStudentInDB(name string, age int) {
+	student := Student {
+		Name: name,
+		Age: age,
+		CreatedAt: time.Now(),
+	}
 	filter := bson.M{}
-	return MongoDBLibrary.RestfulAPIGetUniqueIdentity("uniqueIds", filter, putData)
+	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
 }
 
-func createStudentWithTimeout() {
+func createDocumentWithTimeout() {
 	putData := bson.M{}
-	putData["name"] = "Osman"
+	putData["name"] = "Yak"
 	putData["createdAt"] = time.Now()
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneWithTimeout("student", filter, putData)
+	MongoDBLibrary.RestfulAPIPutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
 }

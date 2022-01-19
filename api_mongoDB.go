@@ -71,28 +71,35 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
-func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int64 {
-	collection := Client.Database(dbName).Collection(collName)
+func RestfulAPIGetUniqueIdentity() int32 {
+	counterCollection := Client.Database(dbName).Collection("counter")
 
-	// get count of documents collection to be used as unique id
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	count, _ := collection.CountDocuments(ctx, filter)
+	counterFilter := bson.M{}
+	counterFilter["_id"] = "uniqueIdentity"
 
-	// insert document so next call to this API will have new count
-	putData["count"] = count
-	collection.InsertOne(ctx, putData)
-	return count
+	for {
+		count := counterCollection.FindOneAndUpdate(context.TODO(), counterFilter, bson.M{"$inc": bson.M{"count": 1}})
 
-	// can we select uusing our own field like count. can we make any primary key? can we fetch docs using that key? can we have multiple search
-	// keys?
-
-	// can we create go based structure that we store and get back?
+		if count.Err() != nil {
+			counterData := bson.M{}
+			counterData["count"] = 1
+			counterData["_id"] = "uniqueIdentity"
+			counterCollection.InsertOne(context.TODO(), counterData)
+			
+			continue
+		} else {
+			data := bson.M{}
+			count.Decode(&data)
+			decodedCount := data["count"].(int32)
+			return decodedCount
+		}
+	}
 }
 
-func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
+func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
 
-	var checkItem map[string]interface{}
+	var checkItem map[string] interface{}
 	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
 
 	if checkItem == nil {
@@ -104,14 +111,14 @@ func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interfa
 	}
 }
 
-func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}) bool {
+func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int32, timeField string) bool {
 	collection := Client.Database(dbName).Collection(collName)
 	var checkItem map[string]interface{}
 
 	// TTL index
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "createdAt", Value: bsonx.Int32(1)}},
-		Options: options.Index().SetExpireAfterSeconds(120),
+		Keys:    bsonx.Doc{{Key: timeField, Value: bsonx.Int32(1)}},
+		Options: options.Index().SetExpireAfterSeconds(timeout),
 	}
 
 	_, err := collection.Indexes().CreateOne(context.Background(), index)
@@ -119,6 +126,21 @@ func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[str
 		logger.MongoDBLog.Panic(err)
 	}
 
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
+}
+
+func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
+	collection := Client.Database(dbName).Collection(collName)
+
+	var checkItem map[string]interface{}
 	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
 
 	if checkItem == nil {
