@@ -80,25 +80,30 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	//counterCollection.FindOne(context.TODO(), bson.M{}).Decode(&checkItem)
 
 	counterFilter := bson.M{}
-	counterFilter["type"] = "uniqueIdentity"
+	counterFilter["_id"] = "uniqueIdentity"
 
-	count := counterCollection.FindOneAndUpdate(context.TODO(), counterFilter, bson.M{"$inc": bson.M{"count": 1}})
+	for {
+		count := counterCollection.FindOneAndUpdate(context.TODO(), counterFilter, bson.M{"$inc": bson.M{"count": 1}})
 
-	if count.Err() != nil {
-		counterData := bson.M{}
-		counterData["count"] = 0
-		counterData["type"] = "uniqueIdentity"
-		counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
-		putData["count"] = 0
-		collection.InsertOne(context.TODO(), putData)
-		return 0
-	} else {
-		data := bson.M{}
-		count.Decode(&data)
-		decodedCount := data["count"].(int32)
-		putData["count"] = decodedCount+1
-		collection.InsertOne(context.TODO(), putData)
-		return decodedCount
+		if count.Err() != nil {
+			counterData := bson.M{}
+			counterData["count"] = 0
+			counterData["_id"] = "uniqueIdentity"
+			result, err := counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
+			if err != nil {
+				continue
+			}
+			putData["count"] = 0
+			collection.InsertOne(context.TODO(), putData)
+			return 0
+		} else {
+			data := bson.M{}
+			count.Decode(&data)
+			decodedCount := data["count"].(int32)
+			putData["count"] = decodedCount+1
+			collection.InsertOne(context.TODO(), putData)
+			return decodedCount
+		}
 	}
 
 	/*
