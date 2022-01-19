@@ -39,13 +39,13 @@ func main() {
 
 	createDocumentWithTimeout()
 
-	uniqueId := getUniqueIdentity("simapp")
+	uniqueId := MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = getUniqueIdentity("SMF")
+	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = getUniqueIdentity("UDF")
+	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
 	log.Println(uniqueId)
 
 	for {
@@ -61,13 +61,6 @@ func insertStudentInDB(name string, age int) {
 	}
 	filter := bson.M{}
 	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
-}
-
-func getUniqueIdentity(name string) int32 {
-	putData := bson.M{}
-	putData["name"] = name
-	filter := bson.M{}
-	return MongoDBLibrary.RestfulAPIGetUniqueIdentity("uniqueIds", filter, putData)
 }
 
 func createDocumentWithTimeout() {
