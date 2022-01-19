@@ -53,9 +53,9 @@ func main() {
 
 func insertStudentInDB() {
 	student := Student {
-		Name: "Osman Amjad"
-		Age: 21
-		CreatedAt: time.Now()
+		Name: "Osman Amjad",
+		Age: 21,
+		CreatedAt: time.Now(),
 	}
 	filter = bson.M{}
 	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
