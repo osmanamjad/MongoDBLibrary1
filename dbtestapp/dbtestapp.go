@@ -8,13 +8,13 @@ package main
 import (
 	"log"
 	"time"
-	"context"
-	"fmt"
-	"os"
+	//"context"
+	//"fmt"
+	//"os"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	//"go.mongodb.org/mongo-driver/bson/primitive"
+	//"go.mongodb.org/mongo-driver/mongo"
+	//"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/osmanamjad/MongoDBLibrary"
 	"go.mongodb.org/mongo-driver/bson"
@@ -57,7 +57,7 @@ func insertStudentInDB() {
 		Age: 21,
 		CreatedAt: time.Now(),
 	}
-	filter = bson.M{}
+	filter := bson.M{}
 	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
 }
 

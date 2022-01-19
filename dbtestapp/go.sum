@@ -293,6 +293,8 @@ github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119151244-06416e75f5f7 h1:NnOb/
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119151244-06416e75f5f7/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119170440-9661c366c2d2 h1:FM4dpbSwFtRjbpFFY5tfF5CFYlIotFbkVr3LRe+MByU=
 github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119170440-9661c366c2d2/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119170635-0baefdc862af h1:gSJ7EiaaRg+0WWBeK/n+JY+voLwYzq2G7Lm4Xakiqec=
+github.com/osmanamjad/MongoDBLibrary v0.0.0-20220119170635-0baefdc862af/go.mod h1:9EZa7NDyv4ju9QjrJ8jsXwoi5m6iqLa8mOd/8CAU8kI=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.7.0/go.mod h1:vwGMzjaWMwyfHwgIBhI2YUM4fB6nL6lVAvS1LBMMhTE=
 github.com/pelletier/go-toml v1.9.3/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
