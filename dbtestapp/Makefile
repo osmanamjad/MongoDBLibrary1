@@ -24,6 +24,7 @@ DOCKER_TARGETS           ?= dbtestapp
 
 # https://docs.docker.com/engine/reference/commandline/build/#specifying-target-build-stage---target
 docker-build:
+	rm -rf vendor
 	@go mod vendor
 	for target in $(DOCKER_TARGETS); do \
 		DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build  $(DOCKER_BUILD_ARGS) \
