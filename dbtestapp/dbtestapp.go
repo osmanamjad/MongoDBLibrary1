@@ -33,9 +33,11 @@ func main() {
 	// connect to mongoDB
 	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
 
-	insertStudentInDB()
+	insertStudentInDB("Osman Amjad", 21)
 
-	createStudentWithTimeout()
+	insertStudentInDB("John Smith", 25)
+
+	createDocumentWithTimeout()
 
 	uniqueId := getUniqueIdentity("simapp")
 	log.Println(uniqueId)
@@ -51,10 +53,10 @@ func main() {
 	}
 }
 
-func insertStudentInDB() {
+func insertStudentInDB(name string, age int) {
 	student := Student {
-		Name: "Osman Amjad",
-		Age: 21,
+		Name: name,
+		Age: age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
@@ -68,10 +70,10 @@ func getUniqueIdentity(name string) int32 {
 	return MongoDBLibrary.RestfulAPIGetUniqueIdentity("uniqueIds", filter, putData)
 }
 
-func createStudentWithTimeout() {
+func createDocumentWithTimeout() {
 	putData := bson.M{}
-	putData["name"] = "John"
+	putData["name"] = "Yak"
 	putData["createdAt"] = time.Now()
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneWithTimeout("student", filter, putData, 120, "createdAt")
+	MongoDBLibrary.RestfulAPIPutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
 }
