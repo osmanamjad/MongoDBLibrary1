@@ -76,15 +76,19 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 
 	counterCollection := Client.Database(dbName).Collection("counter")
 
-	var checkItem map[string]interface{}
-	counterCollection.FindOne(context.TODO(), bson.M{}).Decode(&checkItem)
+	//var checkItem map[string]interface{}
+	//counterCollection.FindOne(context.TODO(), bson.M{}).Decode(&checkItem)
 
-	count := counterCollection.FindOneAndUpdate(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
+	counterFilter := bson.M{}
+	counterFilter["type"] = "uniqueIdentity"
+
+	count := counterCollection.FindOneAndUpdate(context.TODO(), counterFilter, bson.M{"$inc": bson.M{"count": 1}})
 
 	if count.Err() != nil {
 		counterData := bson.M{}
 		counterData["count"] = 0
-		counterCollection.InsertOne(context.TODO(), counterData)
+		counterData["type"] = "uniqueIdentity"
+		counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
 		putData["count"] = 0
 		collection.InsertOne(context.TODO(), putData)
 		return 0
@@ -118,19 +122,8 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 	// can we create go based structure that we store and get back?
 }
 
-func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
-	collection := Client.Database(dbName).Collection(collName)
+func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) interface{} {
 
-	var checkItem map[string]interface{}
-	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
-
-	if checkItem == nil {
-		collection.InsertOne(context.TODO(), putData)
-		return false
-	} else {
-		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
-		return true
-	}
 }
 
 func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
@@ -163,6 +156,21 @@ func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[str
 		logger.MongoDBLog.Panic(err)
 	}
 
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
+}
+
+func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
+	collection := Client.Database(dbName).Collection(collName)
+
+	var checkItem map[string]interface{}
 	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
 
 	if checkItem == nil {
