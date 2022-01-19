@@ -34,7 +34,7 @@ func main() {
 	uniqueId = getUniqueIdentity("SMF")
 	log.Println(uniqueId)
 
-	uniqueId = getUniqueIdentity("UDM")
+	uniqueId = getUniqueIdentity("UDF")
 	log.Println(uniqueId)
 
 	for {
