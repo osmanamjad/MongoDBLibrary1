@@ -72,8 +72,6 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 }
 
 func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[string]interface{}) int32 {
-	//collection := Client.Database(dbName).Collection(collName)
-
 	counterCollection := Client.Database(dbName).Collection("counter")
 
 	counterFilter := bson.M{}
@@ -86,43 +84,17 @@ func RestfulAPIGetUniqueIdentity(collName string, filter bson.M, putData map[str
 			counterData := bson.M{}
 			counterData["count"] = 1
 			counterData["_id"] = "uniqueIdentity"
-			counterCollection.InsertOne(context.TODO(), counterData) // shouuld only insert if theres no document in collection. 
+			counterCollection.InsertOne(context.TODO(), counterData)
 			
 			continue
 		} else {
 			data := bson.M{}
 			count.Decode(&data)
 			decodedCount := data["count"].(int32)
-			//putData["count"] = decodedCount+1
-			//collection.InsertOne(context.TODO(), putData)
 			return decodedCount
 		}
 	}
-
-	/*
-	if checkItem == nil {
-		counterData := bson.M{}
-		counterData["count"] = count
-		counterCollection.InsertOne(context.TODO(), counterData)
-	} else {
-		count = checkItem["count"].(int32)
-		counterCollection.UpdateOne(context.TODO(), bson.M{}, bson.M{"$inc": bson.M{"count": 1}})
-	}
-	*/
-	
-	// seaparte apis for  range and norange
-
-	// uniqe id between 1-255. error/cant insert otherwise. 
-
-	// can we select uusing our own field like count. can we make any primary key? can we fetch docs using that key? can we have multiple search
-	// keys?
-
-	// can we create go based structure that we store and get back?
 }
-
-//func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) interface{} {
-
-//}
 
 func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
