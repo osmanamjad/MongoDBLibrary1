@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	"github.com/free5gc/MongoDBLibrary/logger"
 )
@@ -68,6 +69,72 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 	return resultArray
 
+}
+
+func RestfulAPIGetUniqueIdentity() int32 {
+	counterCollection := Client.Database(dbName).Collection("counter")
+
+	counterFilter := bson.M{}
+	counterFilter["_id"] = "uniqueIdentity"
+
+	for {
+		count := counterCollection.FindOneAndUpdate(context.TODO(), counterFilter, bson.M{"$inc": bson.M{"count": 1}})
+
+		if count.Err() != nil {
+			counterData := bson.M{}
+			counterData["count"] = 1
+			counterData["_id"] = "uniqueIdentity"
+			counterCollection.InsertOne(context.TODO(), counterData)
+			
+			continue
+		} else {
+			data := bson.M{}
+			count.Decode(&data)
+			decodedCount := data["count"].(int32)
+			return decodedCount
+		}
+	}
+}
+
+func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
+	collection := Client.Database(dbName).Collection(collName)
+
+	var checkItem map[string] interface{}
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
+}
+
+func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int32, timeField string) bool {
+	collection := Client.Database(dbName).Collection(collName)
+	var checkItem map[string]interface{}
+
+	// TTL index
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: timeField, Value: bsonx.Int32(1)}},
+		Options: options.Index().SetExpireAfterSeconds(timeout),
+	}
+
+	_, err := collection.Indexes().CreateOne(context.Background(), index)
+	if err != nil {
+		logger.MongoDBLog.Panic(err)
+	}
+
+	collection.FindOne(context.TODO(), filter).Decode(&checkItem)
+
+	if checkItem == nil {
+		collection.InsertOne(context.TODO(), putData)
+		return false
+	} else {
+		collection.UpdateOne(context.TODO(), filter, bson.M{"$set": putData})
+		return true
+	}
 }
 
 func RestfulAPIPutOne(collName string, filter bson.M, putData map[string]interface{}) bool {
