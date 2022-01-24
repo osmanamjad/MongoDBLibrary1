@@ -37,7 +37,7 @@ func main() {
 
 	insertStudentInDB("John Smith", 25)
 
-	student := getStudentFromDB("Osman Amjad", 21)
+	student := getStudentFromDB("Osman Amjad")
 	log.Println("Printing student")
 	log.Println(student)
 	log.Println(student.Name)
@@ -60,10 +60,9 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string, age int) Student {
+func getStudentFromDB(name string) Student {
 	filter := bson.M{}
 	filter["name"] = name
-	filter["age"] = age
 
 	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
 	bsonBytes, _ := bson.Marshal(result)
