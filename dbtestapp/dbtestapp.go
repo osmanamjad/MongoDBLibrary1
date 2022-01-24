@@ -37,6 +37,13 @@ func main() {
 
 	insertStudentInDB("John Smith", 25)
 
+	student := getStudentFromDB("Osman Amjad", 21)
+	log.Println("Printing student")
+	log.Println(student)
+	log.Println(student.Name)
+	log.Println(student.Age)
+	log.Println(student.CreatedAt)
+
 	createDocumentWithTimeout()
 
 	uniqueId := MongoDBLibrary.RestfulAPIGetUniqueIdentity()
@@ -51,6 +58,20 @@ func main() {
 	for {
 		time.Sleep(100 * time.Second)
 	}
+}
+
+func getStudentFromDB(name string, age int) Student {
+	filter := bson.M{}
+	filter["name"] = name
+	filter["age"] = age
+
+	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
+	bsonBytes, _ := bson.Marshal(result)
+
+	var student Student
+	bson.Unmarshal(bsonBytes, &student)
+
+	return student
 }
 
 func insertStudentInDB(name string, age int) {

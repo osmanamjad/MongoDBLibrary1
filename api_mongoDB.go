@@ -96,6 +96,15 @@ func RestfulAPIGetUniqueIdentity() int32 {
 	}
 }
 
+func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) bson.M {
+	collection := Client.Database(dbName).Collection(collName)
+
+	var result bson.M
+	collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	return result
+}
+
 func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
 
