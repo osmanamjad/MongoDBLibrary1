@@ -44,6 +44,7 @@ func main() {
 	log.Println(student.Age)
 	log.Println(student.CreatedAt)
 
+	// test student that doesn't exist.
 	student = getStudentFromDB("Nerf Doodle")
 	log.Println("Printing student2")
 	log.Println(student)
@@ -72,11 +73,6 @@ func getStudentFromDB(name string) Student {
 	filter["name"] = name
 
 	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
-
-	// if result.Err() != nil {
-	// 	log.Println("Error getting student from db: " + result.Err().Error())
-	// 	return nil
-	// }
 
 	bsonBytes, _ := bson.Marshal(result)
 
