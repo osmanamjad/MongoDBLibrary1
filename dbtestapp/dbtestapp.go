@@ -16,7 +16,7 @@ import (
 	//"go.mongodb.org/mongo-driver/mongo"
 	//"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/omec-project/MongoDBLibrary"
+	"github.com/osmanamjad/MongoDBLibrary"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -38,11 +38,22 @@ func main() {
 	insertStudentInDB("John Smith", 25)
 
 	student := getStudentFromDB("Osman Amjad")
-	log.Println("Printing student")
-	log.Println(student)
-	log.Println(student.Name)
-	log.Println(student.Age)
-	log.Println(student.CreatedAt)
+	if student != nil {
+		log.Println("Printing student")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	}
+
+	student = getStudentFromDB("Nerf Doodle")
+	if student != nil {
+		log.Println("Printing student")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	}
 
 	createDocumentWithTimeout()
 
@@ -65,6 +76,12 @@ func getStudentFromDB(name string) Student {
 	filter["name"] = name
 
 	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
+
+	if result.Err() != nil {
+		log.Println("Error getting student from db: " + result.Err().Error())
+		return nil
+	}
+
 	bsonBytes, _ := bson.Marshal(result)
 
 	var student Student
