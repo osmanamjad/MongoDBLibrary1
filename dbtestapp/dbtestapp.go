@@ -38,22 +38,18 @@ func main() {
 	insertStudentInDB("John Smith", 25)
 
 	student := getStudentFromDB("Osman Amjad")
-	if student != nil {
-		log.Println("Printing student")
-		log.Println(student)
-		log.Println(student.Name)
-		log.Println(student.Age)
-		log.Println(student.CreatedAt)
-	}
+	log.Println("Printing student1")
+	log.Println(student)
+	log.Println(student.Name)
+	log.Println(student.Age)
+	log.Println(student.CreatedAt)
 
 	student = getStudentFromDB("Nerf Doodle")
-	if student != nil {
-		log.Println("Printing student")
-		log.Println(student)
-		log.Println(student.Name)
-		log.Println(student.Age)
-		log.Println(student.CreatedAt)
-	}
+	log.Println("Printing student2")
+	log.Println(student)
+	log.Println(student.Name)
+	log.Println(student.Age)
+	log.Println(student.CreatedAt)
 
 	createDocumentWithTimeout()
 
@@ -77,10 +73,10 @@ func getStudentFromDB(name string) Student {
 
 	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
 
-	if result.Err() != nil {
-		log.Println("Error getting student from db: " + result.Err().Error())
-		return nil
-	}
+	// if result.Err() != nil {
+	// 	log.Println("Error getting student from db: " + result.Err().Error())
+	// 	return nil
+	// }
 
 	bsonBytes, _ := bson.Marshal(result)
 

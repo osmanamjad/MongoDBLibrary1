@@ -100,8 +100,13 @@ func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) bson.M 
 	collection := Client.Database(dbName).Collection(collName)
 
 	var result bson.M
-	collection.FindOne(context.TODO(), filter).Decode(&result)
+	val := collection.FindOne(context.TODO(), filter)
 
+	if val.Err() != nil {
+		logger.MongoDBLog.Println("Error getting student from db: " + val.Err().Error())
+		return bson.M{}		
+	}
+	val.Decode(&result)
 	return result
 }
 
