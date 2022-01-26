@@ -103,7 +103,7 @@ func RestfulAPIGetOneCustomDataStructure(collName string, filter bson.M) bson.M 
 
 	if val.Err() != nil {
 		logger.MongoDBLog.Println("Error getting student from db: " + val.Err().Error())
-		return bson.M{}		
+		return bson.M{} // return value, error (nil, error)
 	}
 
 	var result bson.M

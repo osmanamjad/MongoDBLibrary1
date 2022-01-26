@@ -68,11 +68,11 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string) Student {
+func getStudentFromDB(name string) Student { // retuurn error too
 	filter := bson.M{}
 	filter["name"] = name
 
-	result := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
+	result, err := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
 
 	bsonBytes, _ := bson.Marshal(result)
 
