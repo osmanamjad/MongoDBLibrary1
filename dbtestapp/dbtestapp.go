@@ -37,30 +37,34 @@ func main() {
 
 	insertStudentInDB("John Smith", 25)
 
-	student := getStudentFromDB("Osman Amjad")
-	log.Println("Printing student1")
-	log.Println(student)
-	log.Println(student.Name)
-	log.Println(student.Age)
-	log.Println(student.CreatedAt)
+	student, err := getStudentFromDB("Osman Amjad")
+	if err == nil {
+		log.Println("Printing student1")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	}
 
 	// test student that doesn't exist.
-	student = getStudentFromDB("Nerf Doodle")
-	log.Println("Printing student2")
-	log.Println(student)
-	log.Println(student.Name)
-	log.Println(student.Age)
-	log.Println(student.CreatedAt)
+	student, err = getStudentFromDB("Nerf Doodle")
+	if err == nil {
+		log.Println("Printing student2")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	}
 
 	createDocumentWithTimeout()
 
-	uniqueId := MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId := MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
 	for {
@@ -68,18 +72,20 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string) Student { // retuurn error too
+func getStudentFromDB(name string) (Student, error) { // retuurn error too
+	var student Student
 	filter := bson.M{}
 	filter["name"] = name
 
-	result, err := MongoDBLibrary.RestfulAPIGetOneCustomDataStructure("student", filter)
+	result, err := MongoDBLibrary.GetOneCustomDataStructure("student", filter)
 
-	bsonBytes, _ := bson.Marshal(result)
+	if err == nil {
+		bsonBytes, _ := bson.Marshal(result)
+		bson.Unmarshal(bsonBytes, &student)
 
-	var student Student
-	bson.Unmarshal(bsonBytes, &student)
-
-	return student
+		return student, nil
+	}
+	return student, err	
 }
 
 func insertStudentInDB(name string, age int) {
@@ -89,7 +95,7 @@ func insertStudentInDB(name string, age int) {
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
+	MongoDBLibrary.PutOneCustomDataStructure("student", filter, student)
 }
 
 func createDocumentWithTimeout() {
@@ -97,5 +103,5 @@ func createDocumentWithTimeout() {
 	putData["name"] = "Yak"
 	putData["createdAt"] = time.Now()
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
+	MongoDBLibrary.PutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
 }
