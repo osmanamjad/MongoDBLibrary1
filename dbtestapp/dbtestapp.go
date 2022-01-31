@@ -41,6 +41,8 @@ func main() {
 		log.Println(student.Name)
 		log.Println(student.Age)
 		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error());
 	}
 
 	insertStudentInDB("John Smith", 25)
@@ -53,6 +55,8 @@ func main() {
 		log.Println(student.Name)
 		log.Println(student.Age)
 		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error());
 	}
 
 	createDocumentWithTimeout()
