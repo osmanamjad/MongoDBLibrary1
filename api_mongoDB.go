@@ -71,7 +71,7 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
-func RestfulAPIGetUniqueIdentity() int32 {
+func GetUniqueIdentity() int32 {
 	counterCollection := Client.Database(dbName).Collection("counter")
 
 	counterFilter := bson.M{}
@@ -96,7 +96,22 @@ func RestfulAPIGetUniqueIdentity() int32 {
 	}
 }
 
-func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
+func GetOneCustomDataStructure(collName string, filter bson.M) (bson.M, error) {
+	collection := Client.Database(dbName).Collection(collName)
+
+	val := collection.FindOne(context.TODO(), filter)
+
+	if val.Err() != nil {
+		logger.MongoDBLog.Println("Error getting student from db: " + val.Err().Error())
+		return bson.M{}, val.Err()
+	}
+
+	var result bson.M
+	err := val.Decode(&result)
+	return result, err
+}
+
+func PutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
 	collection := Client.Database(dbName).Collection(collName)
 
 	var checkItem map[string] interface{}
@@ -111,7 +126,7 @@ func RestfulAPIPutOneCustomDataStructure(collName string, filter bson.M, putData
 	}
 }
 
-func RestfulAPIPutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int32, timeField string) bool {
+func PutOneWithTimeout(collName string, filter bson.M, putData map[string]interface{}, timeout int32, timeField string) bool {
 	collection := Client.Database(dbName).Collection(collName)
 	var checkItem map[string]interface{}
 

@@ -34,23 +34,61 @@ func main() {
 	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
 
 	insertStudentInDB("Osman Amjad", 21)
+	student, err := getStudentFromDB("Osman Amjad")
+	if err == nil {
+		log.Println("Printing student1")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error());
+	}
 
 	insertStudentInDB("John Smith", 25)
 
+	// test student that doesn't exist.
+	student, err = getStudentFromDB("Nerf Doodle")
+	if err == nil {
+		log.Println("Printing student2")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error());
+	}
+
 	createDocumentWithTimeout()
 
-	uniqueId := MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId := MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.RestfulAPIGetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
 	for {
 		time.Sleep(100 * time.Second)
 	}
+}
+
+func getStudentFromDB(name string) (Student, error) { 
+	var student Student
+	filter := bson.M{}
+	filter["name"] = name
+
+	result, err := MongoDBLibrary.GetOneCustomDataStructure("student", filter)
+
+	if err == nil {
+		bsonBytes, _ := bson.Marshal(result)
+		bson.Unmarshal(bsonBytes, &student)
+
+		return student, nil
+	}
+	return student, err	
 }
 
 func insertStudentInDB(name string, age int) {
@@ -60,7 +98,7 @@ func insertStudentInDB(name string, age int) {
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneCustomDataStructure("student", filter, student)
+	MongoDBLibrary.PutOneCustomDataStructure("student", filter, student)
 }
 
 func createDocumentWithTimeout() {
@@ -68,5 +106,5 @@ func createDocumentWithTimeout() {
 	putData["name"] = "Yak"
 	putData["createdAt"] = time.Now()
 	filter := bson.M{}
-	MongoDBLibrary.RestfulAPIPutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
+	MongoDBLibrary.PutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
 }
