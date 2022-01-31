@@ -107,8 +107,8 @@ func GetOneCustomDataStructure(collName string, filter bson.M) (bson.M, error) {
 	}
 
 	var result bson.M
-	val.Decode(&result)
-	return result, nil
+	err := val.Decode(&result)
+	return result, err
 }
 
 func PutOneCustomDataStructure(collName string, filter bson.M, putData interface{}) bool {
