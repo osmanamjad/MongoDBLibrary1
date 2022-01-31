@@ -34,9 +34,6 @@ func main() {
 	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
 
 	insertStudentInDB("Osman Amjad", 21)
-
-	insertStudentInDB("John Smith", 25)
-
 	student, err := getStudentFromDB("Osman Amjad")
 	if err == nil {
 		log.Println("Printing student1")
@@ -45,6 +42,8 @@ func main() {
 		log.Println(student.Age)
 		log.Println(student.CreatedAt)
 	}
+
+	insertStudentInDB("John Smith", 25)
 
 	// test student that doesn't exist.
 	student, err = getStudentFromDB("Nerf Doodle")
@@ -72,7 +71,7 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) { // retuurn error too
+func getStudentFromDB(name string) (Student, error) { 
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
