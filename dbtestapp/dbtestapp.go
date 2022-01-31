@@ -16,7 +16,7 @@ import (
 	//"go.mongodb.org/mongo-driver/mongo"
 	//"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/omec-project/MongoDBLibrary"
+	"github.com/osmanamjad/MongoDBLibrary"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
