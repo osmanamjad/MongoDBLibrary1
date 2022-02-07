@@ -8,8 +8,8 @@ Testapp in this repository builds a container of test application. All the APIs 
 MongoDBLibrary are used by testApp. All new developement of MongoDBlibrary comes with 
 correspondinig example in the testApp. 
 
-You can use AIAB ( Aether in a Box ) setup to run test application. Refer SD-Core
-document <https://docs.sd-core.opennetworking.org/master/developer/aiab.html#> 
+You can use AIAB ( Aether in a Box ) setup to run test application. Refer [SD-Core
+document](https://docs.sd-core.opennetworking.org/master/developer/aiab.html#)
 
 ## Upcoming Work
 
