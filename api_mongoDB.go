@@ -1,21 +1,17 @@
-// SPDX-FileCopyrightText: 2021 Open Networking Foundation <info@opennetworking.org>
-// Copyright 2019 free5GC.org
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-
 package MongoDBLibrary
 
 import (
 	"context"
 	"encoding/json"
 	"time"
+	"errors"
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/free5gc/MongoDBLibrary/logger"
 )
@@ -100,6 +96,96 @@ func GetUniqueIdentity() int32 {
 			return decodedCount
 		}
 	}
+}
+
+func GetUniqueIdentityWithinRange(min int32, max int32) int32 {
+	rangeCollection := Client.Database(dbName).Collection("range")
+
+	rangeFilter := bson.M{}
+	rangeFilter["_id"] = "uniqueIdentity"
+
+	for {
+		count := rangeCollection.FindOneAndUpdate(context.TODO(), rangeFilter, bson.M{"$inc": bson.M{"count": 1}})
+
+		if count.Err() != nil {
+			counterData := bson.M{}
+			counterData["count"] = min
+			counterData["_id"] = "uniqueIdentity"
+			rangeCollection.InsertOne(context.TODO(), counterData)
+			
+			continue
+		} else {
+			data := bson.M{}
+			count.Decode(&data)
+			decodedCount := data["count"].(int32)
+
+			if (decodedCount >= max || decodedCount <= min) {
+				err := errors.New("Unique identity is out of range.")
+				logger.MongoDBLog.Println(err)
+				return -1
+			}
+			return decodedCount
+		}
+	}
+}
+
+/* Initialize pool of ids with max and min values. */
+func InitializePool(poolName string, min int32, max int32) {
+	poolCollection := Client.Database(dbName).Collection(poolName)
+	array := []int32{}
+	for i := min; i < max; i++ {
+		array = append(array, i)
+	}
+	poolData := bson.M{}
+	poolData["ids"] = array
+	poolData["_id"] = "1"
+
+	poolCollection.InsertOne(context.TODO(), poolData)
+}
+
+/* For example IP addresses need to be assigned and then returned to be used again. */
+// need to test with empty array.
+func GetIDFromPool(poolName string) (int32, error) {
+	poolCollection := Client.Database(dbName).Collection(poolName)
+
+	poolFilter := bson.M{}
+	poolFilter["_id"] = "1"
+
+	result := bson.M{}
+	poolCollection.FindOne(context.TODO(), poolFilter).Decode(&result)
+	logger.MongoDBLog.Println(result["ids"])
+
+	//var pool Pool
+	var array []int32
+	//prim := result["ids"].(primitive.A)
+	//logger.MongoDBLog.Println(prim)
+	interfaces := []interface{}(result["ids"].(primitive.A))
+	logger.MongoDBLog.Println(interfaces)
+	for _, s := range interfaces {
+		id := s.(int32)
+		array = append(array, id)
+	}
+
+	logger.MongoDBLog.Println(array)
+	if len(array) != 0 {
+		res := array[len(array) - 1]
+		// pop from array
+		updateFilter := bson.M{}
+		updateFilter["_id"] = "1"
+		poolCollection.UpdateOne(context.TODO(), bson.M{"_id": "1"}, bson.M{"$pop": bson.M{"ids":1}} )
+		return res, nil
+	} else {
+		err := errors.New("There are no available ids. ")
+		logger.MongoDBLog.Println(err)
+		return -1, err
+	}
+}
+
+/* Release the provided id from the provided pool. */
+func ReleaseIDFromPool(poolName string, id int32) {
+	poolCollection := Client.Database(dbName).Collection(poolName)
+
+	poolCollection.UpdateOne(context.TODO(), bson.M{"_id": "1"}, bson.M{"$push": bson.M{"ids":id}})
 }
 
 func GetOneCustomDataStructure(collName string, filter bson.M) (bson.M, error) {

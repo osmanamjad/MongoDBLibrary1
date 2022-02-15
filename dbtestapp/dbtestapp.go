@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: Apache-2.0
-//
+// SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
 
 package main
 
@@ -23,16 +23,17 @@ import (
 
 type Student struct {
 	//ID     		primitive.ObjectID 	`bson:"_id,omitempty"`
-	Name      string    `bson:"name,omitempty"`
-	Age       int       `bson:"age,omitempty"`
-	CreatedAt time.Time `bson:"createdAt,omitempty"`
+	Name      	string				`bson:"name,omitempty"`
+	Age 	  	int 				`bson:"age,omitempty"`
+	Subject		string 				`bson:"subject,omitempty"`
+	CreatedAt 	time.Time			`bson:"createdAt,omitempty"`
 }
 
 func main() {
 	log.Println("dbtestapp started")
 
 	// connect to mongoDB
-	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
+	MongoDBLibrary.SetMongoDB("sdcore", "mongodb://mongodb:27017")
 
 	insertStudentInDB("Osman Amjad", 21)
 	student, err := getStudentFromDB("Osman Amjad")
@@ -68,7 +69,23 @@ func main() {
 	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.GetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
+	log.Println(uniqueId)
+
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
+	log.Println(uniqueId)
+
+	MongoDBLibrary.InitializePool("pool", 10, 32)
+	
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
+	log.Println(uniqueId)
+
+	MongoDBLibrary.ReleaseIDFromPool("pool", uniqueId)
+
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
+	log.Println(uniqueId)
+
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
 	log.Println(uniqueId)
 
 	for {
@@ -76,7 +93,7 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) {
+func getStudentFromDB(name string) (Student, error) { 
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
@@ -89,13 +106,13 @@ func getStudentFromDB(name string) (Student, error) {
 
 		return student, nil
 	}
-	return student, err
+	return student, err	
 }
 
 func insertStudentInDB(name string, age int) {
-	student := Student{
-		Name:      name,
-		Age:       age,
+	student := Student {
+		Name: name,
+		Age: age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
