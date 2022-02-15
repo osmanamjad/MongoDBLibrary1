@@ -150,7 +150,6 @@ func InitializePool(poolName string, min int32, max int32) {
 }
 
 /* For example IP addresses need to be assigned and then returned to be used again. */
-// need to test with empty array.
 func GetIDFromPool(poolName string) (int32, error) {
 	poolCollection := Client.Database(dbName).Collection(poolName)
 
