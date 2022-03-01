@@ -75,18 +75,51 @@ func main() {
 	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
 	log.Println(uniqueId)
 
-	MongoDBLibrary.InitializePool("pool", 10, 32)
+	log.Println("TESTING POOL OF IDS")
+
+	MongoDBLibrary.InitializePool("pool1", 10, 32)
 	
-	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
 	log.Println(uniqueId)
 
-	MongoDBLibrary.ReleaseIDFromPool("pool", uniqueId)
+	MongoDBLibrary.ReleaseIDToPool("pool1", uniqueId)
 
-	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
 	log.Println(uniqueId)
 
-	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool")
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
 	log.Println(uniqueId)
+
+	log.Println("TESTING INSERT APPROACH")
+	var randomId int32
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.InitializeInsertPool("insertApproach", 0, 1000, 3)
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.ReleaseIDToInsertPool("insertApproach", randomId)
+
+	log.Println("TESTING RETRIES")
+
+	MongoDBLibrary.InitializeInsertPool("testRetry", 0, 6, 3)
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("testRetry")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("testRetry")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
 
 	for {
 		time.Sleep(100 * time.Second)
