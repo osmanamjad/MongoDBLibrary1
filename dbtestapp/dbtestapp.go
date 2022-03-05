@@ -23,16 +23,17 @@ import (
 
 type Student struct {
 	//ID     		primitive.ObjectID 	`bson:"_id,omitempty"`
-	Name      string    `bson:"name,omitempty"`
-	Age       int       `bson:"age,omitempty"`
-	CreatedAt time.Time `bson:"createdAt,omitempty"`
+	Name      	string				`bson:"name,omitempty"`
+	Age 	  	int 				`bson:"age,omitempty"`
+	Subject		string 				`bson:"subject,omitempty"`
+	CreatedAt 	time.Time			`bson:"createdAt,omitempty"`
 }
 
 func main() {
 	log.Println("dbtestapp started")
 
 	// connect to mongoDB
-	MongoDBLibrary.SetMongoDB("free5gc", "mongodb://mongodb:27017")
+	MongoDBLibrary.SetMongoDB("sdcore", "mongodb://mongodb:27017")
 
 	insertStudentInDB("Osman Amjad", 21)
 	student, err := getStudentFromDB("Osman Amjad")
@@ -68,15 +69,64 @@ func main() {
 	uniqueId = MongoDBLibrary.GetUniqueIdentity()
 	log.Println(uniqueId)
 
-	uniqueId = MongoDBLibrary.GetUniqueIdentity()
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
 	log.Println(uniqueId)
+
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
+	log.Println(uniqueId)
+
+	log.Println("TESTING POOL OF IDS")
+
+	MongoDBLibrary.InitializePool("pool1", 10, 32)
+	
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
+	log.Println(uniqueId)
+
+	MongoDBLibrary.ReleaseIDToPool("pool1", uniqueId)
+
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
+	log.Println(uniqueId)
+
+	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
+	log.Println(uniqueId)
+
+	log.Println("TESTING INSERT APPROACH")
+	var randomId int32
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.InitializeInsertPool("insertApproach", 0, 1000, 3)
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("insertApproach")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.ReleaseIDToInsertPool("insertApproach", randomId)
+
+	log.Println("TESTING RETRIES")
+
+	MongoDBLibrary.InitializeInsertPool("testRetry", 0, 6, 3)
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("testRetry")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, err = MongoDBLibrary.GetIDFromInsertPool("testRetry")
+	log.Println(randomId)
+	if (err != nil) {log.Println(err.Error())}
 
 	for {
 		time.Sleep(100 * time.Second)
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) {
+func getStudentFromDB(name string) (Student, error) { 
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
@@ -89,13 +139,13 @@ func getStudentFromDB(name string) (Student, error) {
 
 		return student, nil
 	}
-	return student, err
+	return student, err	
 }
 
 func insertStudentInDB(name string, age int) {
-	student := Student{
-		Name:      name,
-		Age:       age,
+	student := Student {
+		Name: name,
+		Age: age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
