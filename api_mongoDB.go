@@ -12,6 +12,7 @@ import (
 	"time"
 	"errors"
 	"math/rand"
+	"os"
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"go.mongodb.org/mongo-driver/bson"
@@ -81,6 +82,7 @@ func RestfulAPIGetMany(collName string, filter bson.M) []map[string]interface{} 
 
 }
 
+/* Get unique identity from counter collection. */
 func GetUniqueIdentity() int32 {
 	counterCollection := Client.Database(dbName).Collection("counter")
 
@@ -106,6 +108,7 @@ func GetUniqueIdentity() int32 {
 	}
 }
 
+/* Get a unique id within a given range. */
 func GetUniqueIdentityWithinRange(min int32, max int32) int32 {
 	rangeCollection := Client.Database(dbName).Collection("range")
 
@@ -134,6 +137,84 @@ func GetUniqueIdentityWithinRange(min int32, max int32) int32 {
 			}
 			return decodedCount
 		}
+	}
+}
+
+/* Initialize pool of ids with max and min values and chunk size and amount of retries to get a chunk. */
+func InitializeChunkPool(poolName string, min int, max int, retries int, chunkSize int) {
+	logger.MongoDBLog.Println("ENTERING InitializeChunkPool")
+	var poolData = map[string]int{}
+	poolData["min"] = min
+	poolData["max"] = max
+	poolData["retries"] = retries
+	poolData["chunkSize"] = chunkSize
+
+	pools[poolName] = poolData
+	logger.MongoDBLog.Println("Pools: ", pools)
+}
+
+/* Get id by inserting into collection. If insert succeeds, that id is available. Else, it isn't available so retry. */
+func GetChunkFromPool(poolName string) (int32, int32, int32, error) {
+	logger.MongoDBLog.Println("ENTERING GetChunkFromPool")
+
+	var pool = pools[poolName]
+
+	if pool == nil {
+		err := errors.New("This pool has not been initialized yet. Initialize by calling InitializeChunkPool.")
+		return -1, -1, -1, err
+	} 
+
+	min := pool["min"]
+	max := pool["max"]
+	retries := pool["retries"]
+	chunkSize := pool["chunkSize"]
+	totalChunks := int((max - min)/chunkSize) 
+
+	i := 0
+	for i < retries {
+		random := rand.Intn(totalChunks)
+		lower := min + (random*chunkSize)
+		upper := lower + chunkSize
+		poolCollection := Client.Database(dbName).Collection(poolName)
+
+		// Create an instance of an options and set the desired options
+		upsert := true
+		opt := options.FindOneAndUpdateOptions{
+			Upsert: &upsert,
+		}
+		data := bson.M{}
+		data["_id"] = random
+		data["lower"] = lower
+		data["upper"] = upper
+		data["owner"] = os.Getenv("HOSTNAME")
+		result := poolCollection.FindOneAndUpdate(context.TODO(), bson.M{"_id": random}, bson.M{"$setOnInsert": data}, &opt)
+
+		if result.Err() != nil {
+			// means that there was no document with that id, so the upsert should have been successful 
+			if result.Err().Error() == "mongo: no documents in result" {
+				logger.MongoDBLog.Println("Assigned chunk # ", random, " with range ", lower, " - ", upper)
+				return int32(random), int32(lower), int32(upper), nil
+			}
+			
+			return -1, -1, -1, result.Err()
+		}
+		// means there was a document before the update and result contains that document. 
+		logger.MongoDBLog.Println("Chunk", random, " has already been assigned. ", retries - i - 1, " retries left.")
+		i++
+	}
+
+	err := errors.New("No id found after retries")
+	return -1, -1, -1, err
+}
+
+/* Release the provided id to the provided pool. */
+func ReleaseChunkToPool(poolName string, id int32) {
+	logger.MongoDBLog.Println("ENTERING ReleaseChunkToPool")
+	poolCollection := Client.Database(dbName).Collection(poolName)
+
+	_, err := poolCollection.DeleteOne(context.TODO(), bson.M{"_id": id})
+	if (err != nil) {
+		logger.MongoDBLog.Panic(err)
 	}
 }
 

@@ -121,12 +121,35 @@ func main() {
 	log.Println(randomId)
 	if (err != nil) {log.Println(err.Error())}
 
+	log.Println("TESTING CHUNK APPROACH")
+	var lower int32
+	var upper int32
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.InitializeChunkPool("studentIdsChunkApproach", 0, 1000, 5, 100) // min, max, retries, chunkSize
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	//MongoDBLibrary.ReleaseChunkToPool("chunkApproach", randomId)
+
 	for {
 		time.Sleep(100 * time.Second)
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) { 
+func getStudentFromDB(name string) (Student, error) {
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
@@ -139,13 +162,13 @@ func getStudentFromDB(name string) (Student, error) {
 
 		return student, nil
 	}
-	return student, err	
+	return student, err
 }
 
 func insertStudentInDB(name string, age int) {
-	student := Student {
-		Name: name,
-		Age: age,
+	student := Student{
+		Name:      name,
+		Age:       age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
