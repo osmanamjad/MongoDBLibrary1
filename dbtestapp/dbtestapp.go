@@ -139,9 +139,6 @@ func main() {
 	log.Println(randomId, lower, upper)
 	if (err != nil) {log.Println(err.Error())}
 
-	log.Println(randomId, lower, upper)
-	if (err != nil) {log.Println(err.Error())}
-
 	//MongoDBLibrary.ReleaseChunkToPool("chunkApproach", randomId)
 
 	for {
@@ -149,7 +146,7 @@ func main() {
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) {
+func getStudentFromDB(name string) (Student, error) { 
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
@@ -162,13 +159,13 @@ func getStudentFromDB(name string) (Student, error) {
 
 		return student, nil
 	}
-	return student, err
+	return student, err	
 }
 
 func insertStudentInDB(name string, age int) {
-	student := Student{
-		Name:      name,
-		Age:       age,
+	student := Student {
+		Name: name,
+		Age: age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
