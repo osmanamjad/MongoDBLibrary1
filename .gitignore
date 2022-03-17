@@ -18,3 +18,5 @@ cscope.*
 # mac
 .DS_Store
 
+dbtestapp/go.sum
+dbtestapp/vendor

@@ -121,6 +121,30 @@ func main() {
 	log.Println(randomId)
 	if (err != nil) {log.Println(err.Error())}
 
+	log.Println("TESTING CHUNK APPROACH")
+	var lower int32
+	var upper int32
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.InitializeChunkPool("studentIdsChunkApproach", 0, 1000, 5, 100) // min, max, retries, chunkSize
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.ReleaseChunkToPool("studentIdsChunkApproach", randomId)
+
 	for {
 		time.Sleep(100 * time.Second)
 	}
