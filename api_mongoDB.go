@@ -191,7 +191,7 @@ func GetChunkFromPool(poolName string) (int32, int32, int32, error) {
 
 		if result.Err() != nil {
 			// means that there was no document with that id, so the upsert should have been successful 
-			if result.Err().Error() == "mongo: no documents in result" {
+			if (result.Err() == mongo.ErrNoDocuments) {
 				logger.MongoDBLog.Println("Assigned chunk # ", random, " with range ", lower, " - ", upper)
 				return int32(random), int32(lower), int32(upper), nil
 			}
@@ -212,7 +212,11 @@ func ReleaseChunkToPool(poolName string, id int32) {
 	logger.MongoDBLog.Println("ENTERING ReleaseChunkToPool")
 	poolCollection := Client.Database(dbName).Collection(poolName)
 
-	_, err := poolCollection.DeleteOne(context.TODO(), bson.M{"_id": id})
+	// only want to delete if the currentApp is the owner of this id. 
+	currentApp := os.Getenv("HOSTNAME")
+	logger.MongoDBLog.Println(currentApp)
+
+	_, err := poolCollection.DeleteOne(context.TODO(), bson.M{"_id": id, "owner": currentApp})
 	if (err != nil) {
 		logger.MongoDBLog.Panic(err)
 	}

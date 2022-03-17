@@ -139,7 +139,11 @@ func main() {
 	log.Println(randomId, lower, upper)
 	if (err != nil) {log.Println(err.Error())}
 
-	//MongoDBLibrary.ReleaseChunkToPool("chunkApproach", randomId)
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
+
+	MongoDBLibrary.ReleaseChunkToPool("studentIdsChunkApproach", randomId)
 
 	for {
 		time.Sleep(100 * time.Second)
