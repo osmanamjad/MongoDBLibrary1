@@ -35,51 +35,52 @@ func main() {
 	// connect to mongoDB
 	MongoDBLibrary.SetMongoDB("sdcore", "mongodb://mongodb:27017")
 
-	insertStudentInDB("Osman Amjad", 21)
-	student, err := getStudentFromDB("Osman Amjad")
-	if err == nil {
-		log.Println("Printing student1")
-		log.Println(student)
-		log.Println(student.Name)
-		log.Println(student.Age)
-		log.Println(student.CreatedAt)
-	} else {
-		log.Println("Error getting student: " + err.Error())
+	// test inserting document with timeout
+	TestDocumentWithTimeout()
+
+	// test inserting and getting document that uses custom data structure
+	TestCustomDataStructure()
+
+	// test getting unique id, and getting unique id within a range
+	TestGetUniqueIdentity()
+
+	// test getting id from pool. 
+	TestGetIdFromPool()
+
+	// test getting chunk of ids from pool
+	TestGetChunkFromPool()
+
+	for {
+		time.Sleep(100 * time.Second)
 	}
+}
 
-	insertStudentInDB("John Smith", 25)
+func TestGetChunkFromPool() {
+	log.Println("TESTING CHUNK APPROACH")
 
-	// test student that doesn't exist.
-	student, err = getStudentFromDB("Nerf Doodle")
-	if err == nil {
-		log.Println("Printing student2")
-		log.Println(student)
-		log.Println(student.Name)
-		log.Println(student.Age)
-		log.Println(student.CreatedAt)
-	} else {
-		log.Println("Error getting student: " + err.Error())
-	}
+	randomId, lower, upper, err := MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
 
-	createDocumentWithTimeout()
+	MongoDBLibrary.InitializeChunkPool("studentIdsChunkApproach", 0, 1000, 5, 100) // min, max, retries, chunkSize
 
-	uniqueId := MongoDBLibrary.GetUniqueIdentity()
-	log.Println(uniqueId)
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
 
-	uniqueId = MongoDBLibrary.GetUniqueIdentity()
-	log.Println(uniqueId)
+	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
+	log.Println(randomId, lower, upper)
+	if (err != nil) {log.Println(err.Error())}
 
-	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
-	log.Println(uniqueId)
+	MongoDBLibrary.ReleaseChunkToPool("studentIdsChunkApproach", randomId)
+}
 
-	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
-	log.Println(uniqueId)
-
+func TestGetIdFromPool() {
 	log.Println("TESTING POOL OF IDS")
 
 	MongoDBLibrary.InitializePool("pool1", 10, 32)
 	
-	uniqueId, err = MongoDBLibrary.GetIDFromPool("pool1")
+	uniqueId, err := MongoDBLibrary.GetIDFromPool("pool1")
 	log.Println(uniqueId)
 
 	MongoDBLibrary.ReleaseIDToPool("pool1", uniqueId)
@@ -120,37 +121,59 @@ func main() {
 	randomId, err = MongoDBLibrary.GetIDFromInsertPool("testRetry")
 	log.Println(randomId)
 	if (err != nil) {log.Println(err.Error())}
+}
 
-	log.Println("TESTING CHUNK APPROACH")
-	var lower int32
-	var upper int32
+func TestGetUniqueIdentity() {
+	uniqueId := MongoDBLibrary.GetUniqueIdentity()
+	log.Println(uniqueId)
 
-	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
-	log.Println(randomId, lower, upper)
-	if (err != nil) {log.Println(err.Error())}
+	uniqueId = MongoDBLibrary.GetUniqueIdentity()
+	log.Println(uniqueId)
 
-	MongoDBLibrary.InitializeChunkPool("studentIdsChunkApproach", 0, 1000, 5, 100) // min, max, retries, chunkSize
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
+	log.Println(uniqueId)
 
-	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
-	log.Println(randomId, lower, upper)
-	if (err != nil) {log.Println(err.Error())}
+	uniqueId = MongoDBLibrary.GetUniqueIdentityWithinRange(3, 6)
+	log.Println(uniqueId)
+}
 
-	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
-	log.Println(randomId, lower, upper)
-	if (err != nil) {log.Println(err.Error())}
+func TestCustomDataStructure() {
+	insertStudentInDB("Osman Amjad", 21)
+	student, err := getStudentFromDB("Osman Amjad")
+	if err == nil {
+		log.Println("Printing student1")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error())
+	}
 
-	randomId, lower, upper, err = MongoDBLibrary.GetChunkFromPool("studentIdsChunkApproach")
-	log.Println(randomId, lower, upper)
-	if (err != nil) {log.Println(err.Error())}
+	insertStudentInDB("John Smith", 25)
 
-	MongoDBLibrary.ReleaseChunkToPool("studentIdsChunkApproach", randomId)
-
-	for {
-		time.Sleep(100 * time.Second)
+	// test student that doesn't exist.
+	student, err = getStudentFromDB("Nerf Doodle")
+	if err == nil {
+		log.Println("Printing student2")
+		log.Println(student)
+		log.Println(student.Name)
+		log.Println(student.Age)
+		log.Println(student.CreatedAt)
+	} else {
+		log.Println("Error getting student: " + err.Error())
 	}
 }
 
-func getStudentFromDB(name string) (Student, error) { 
+func TestDocumentWithTimeout() {
+	putData := bson.M{}
+	putData["name"] = "Yak"
+	putData["createdAt"] = time.Now()
+	filter := bson.M{}
+	MongoDBLibrary.PutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
+}
+
+func getStudentFromDB(name string) (Student, error) {
 	var student Student
 	filter := bson.M{}
 	filter["name"] = name
@@ -163,23 +186,15 @@ func getStudentFromDB(name string) (Student, error) {
 
 		return student, nil
 	}
-	return student, err	
+	return student, err
 }
 
 func insertStudentInDB(name string, age int) {
-	student := Student {
-		Name: name,
-		Age: age,
+	student := Student{
+		Name:      name,
+		Age:       age,
 		CreatedAt: time.Now(),
 	}
 	filter := bson.M{}
 	MongoDBLibrary.PutOneCustomDataStructure("student", filter, student)
-}
-
-func createDocumentWithTimeout() {
-	putData := bson.M{}
-	putData["name"] = "Yak"
-	putData["createdAt"] = time.Now()
-	filter := bson.M{}
-	MongoDBLibrary.PutOneWithTimeout("timeout", filter, putData, 120, "createdAt")
 }
